@@ -1,0 +1,57 @@
+mql5
+// Developer: Forex Robot Easy Team
+// Website: forexroboteasy.com
+
+// Include necessary libraries
+#include <Trade\Trade.mqh>
+#include <Expert\Expert.mqh>
+
+// Define input parameters
+input double lotSize = 0.01;            // Initial lot size
+input double maxLotSize = 0.1;          // Maximum lot size
+input double stopLoss = 100;            // Stop loss level
+input double takeProfit = 200;          // Take profit level
+input double trailingStop = 50;         // Trailing stop level
+input int magicNumber = 123456;         // Unique identifier for trades
+
+// Define global variables
+CTrade trade;                           // Trade functions object
+
+// Initialize Expert Advisor
+void OnInit()
+{
+    trade.SetExpertMagicNumber(magicNumber);
+
+    // Set initial trade parameters
+    trade.SetLots(lotSize);
+    trade.SetMaxLots(maxLotSize);
+    trade.SetStopLoss(stopLoss);
+    trade.SetTakeProfit(takeProfit);
+    trade.SetTrailingStop(trailingStop);
+}
+
+// Start Expert Advisor
+void OnTick()
+{
+    // Get current market conditions
+    double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+
+    // Check if market conditions are favorable
+    if (currentPrice > takeProfit)
+    {
+        // Place a buy trade
+        trade.Buy(_Symbol, lotSize);
+    }
+    else if (currentPrice < stopLoss)
+    {
+        // Place a sell trade
+        trade.Sell(_Symbol, lotSize);
+    }
+}
+
+// Stop Expert Advisor
+void OnDeinit(const int reason)
+{
+    // Close all open positions
+    trade.CloseAll();
+}
